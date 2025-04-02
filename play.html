@@ -57,7 +57,7 @@
       justify-content: center; /* Center buttons horizontally */
       margin-top: 20px;
     }
-    #reshuffle-button {
+    #shuffle-button {
       background-color: #007bff; /* Blue background */
       color: white; /* White text */
       border: none; /* Remove border */
@@ -66,7 +66,7 @@
       font-size: 16px;
       cursor: pointer;
     }
-    #reshuffle-button:hover {
+    #shuffle-button:hover {
       background-color: #0056b3; /* Darker blue on hover */
     }
   </style>
@@ -77,7 +77,7 @@
   <div id="button-container">
     <button onclick="goToEditPage()">Edit</button>
     <button onclick="resetCompletedCells()">Reset</button>
-    <button id="reshuffle-button" onclick="reshuffle()">Reshuffle</button>
+    <button id="shuffle-button" onclick="shuffle()">Shuffle</button>
   </div>
   <script>
     function loadStateFromURL() {
@@ -121,7 +121,7 @@
       }
     }
 
-    function reshuffle() {
+    function shuffle() {
       const params = new URLSearchParams(window.location.search);
       const state = params.get('state');
       if (state) {
@@ -130,7 +130,7 @@
         window.history.replaceState(null, '', newURL); // Replace the current state with the new seed
         loadStateFromURL(); // Reload the grid with the new seed
       } else {
-        alert('No Bingo card state found to reshuffle.');
+        alert('No Bingo card state found to shuffle.');
       }
     }
 
