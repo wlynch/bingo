@@ -92,6 +92,8 @@
         try {
           const { title, cells } = JSON.parse(atob(state)); // Decode Base64 state
           titleElement.textContent = title;
+          // Update browser tab title
+          document.title = title || "Bingo Play";
 
           const shuffledCells = shuffleArray(cells, seed); // Shuffle cells using the seed
           shuffledCells.forEach((value, index) => {

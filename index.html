@@ -171,6 +171,8 @@
         try {
           const { title, cells } = JSON.parse(atob(state)); // Decode Base64 state
           titleInput.value = title;
+          // Update browser tab title
+          document.title = (title || "Bingo Card Maker") + " - Edit";
           cells.forEach((value, index) => {
             const cell = document.createElement('div');
             cell.classList.add('cell');
@@ -192,6 +194,8 @@
 
     function updateTitleState() {
       updateURLState();
+      // Update browser tab title to match the bingo card title
+      document.title = (document.getElementById('bingo-title').value || "Bingo Card Maker") + " - Edit";
     }
 
     function resetBingoCard() {
