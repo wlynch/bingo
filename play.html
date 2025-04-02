@@ -31,7 +31,7 @@
       align-items: center;
       justify-content: center;
       border: 1px solid #000;
-      font-size: 16px; /* Adjust font size for smaller screens */
+      font-size: 22px; /* Increased font size for better visibility */
       font-weight: bold;
       background-color: #f9f9f9;
       cursor: pointer;
@@ -109,7 +109,7 @@
             bingoCard.appendChild(cell);
           });
 
-          // Update the URL with the seed
+          // Replace the state and seed in the browser history
           const newURL = `${window.location.origin}${window.location.pathname}?state=${state}&seed=${seed}`;
           window.history.replaceState(null, '', newURL);
         } catch (error) {
@@ -127,7 +127,8 @@
       if (state) {
         const newSeed = Math.random().toString(36).substring(2); // Generate a new random seed
         const newURL = `${window.location.origin}${window.location.pathname}?state=${state}&seed=${newSeed}`;
-        window.location.href = newURL; // Reload the page with the new seed
+        window.history.replaceState(null, '', newURL); // Replace the current state with the new seed
+        loadStateFromURL(); // Reload the grid with the new seed
       } else {
         alert('No Bingo card state found to reshuffle.');
       }

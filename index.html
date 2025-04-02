@@ -31,7 +31,7 @@
       align-items: center;
       justify-content: center;
       border: 1px solid #000;
-      font-size: 16px; /* Adjust font size for smaller screens */
+      font-size: 20px; /* Increased font size for better visibility */
       font-weight: bold;
       background-color: #f9f9f9;
       overflow: hidden; /* Prevent overflow */
@@ -71,7 +71,7 @@
       height: 100%;
       border: none;
       text-align: center; /* Center text horizontally */
-      font-size: 14px; /* Adjust font size for smaller screens */
+      font-size: 20px; /* Increased font size for better visibility */
       font-weight: bold;
       background-color: transparent;
       overflow-wrap: break-word; /* Ensure long words break properly */
@@ -124,7 +124,7 @@
         const textarea = document.createElement('textarea');
         textarea.value = i === 12 ? 'FREE' : ''; // Center "FREE" cell
         if (i === 12) textarea.readOnly = true;
-        textarea.addEventListener('input', updateURLState);
+        textarea.addEventListener('blur', updateURLState); // Save state when leaving the cell
         cell.appendChild(textarea);
         bingoCard.appendChild(cell);
       }
@@ -138,8 +138,27 @@
       const title = document.getElementById('bingo-title').value;
       const encodedState = btoa(JSON.stringify({ title, cells: cellValues })); // Base64 encode the state
       const newURL = `${window.location.origin}${window.location.pathname}?state=${encodedState}`;
-      window.history.replaceState(null, '', newURL);
+      window.history.pushState({ state: encodedState }, '', newURL); // Push state to history
     }
+
+    window.addEventListener('popstate', (event) => {
+      if (event.state && event.state.state) {
+        const { title, cells } = JSON.parse(atob(event.state.state)); // Decode Base64 state
+        document.getElementById('bingo-title').value = title;
+        const bingoCard = document.getElementById('bingo-card');
+        bingoCard.innerHTML = ''; // Clear the card
+        cells.forEach((value, index) => {
+          const cell = document.createElement('div');
+          cell.classList.add('cell');
+          const textarea = document.createElement('textarea');
+          textarea.value = value;
+          if (index === 12) textarea.readOnly = true; // Center "FREE" cell
+          textarea.addEventListener('blur', updateURLState); // Save state when leaving the cell
+          cell.appendChild(textarea);
+          bingoCard.appendChild(cell);
+        });
+      }
+    });
 
     function loadStateFromURL() {
       const params = new URLSearchParams(window.location.search);
