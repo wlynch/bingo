@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bingo Card Maker</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background-color: #f0f0f0; /* Optional: Add a background color */
+    }
+    #bingo-card {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 5px;
+      width: auto; /* Adjust width to fit the grid */
+      margin-top: 20px; /* Add spacing between the title and the grid */
+      justify-content: center; /* Center the grid horizontally */
+    }
+    .cell {
+      width: 120px; /* Increased from 100px */
+      height: 120px; /* Increased from 100px */
+      display: flex;
+      align-items: stretch; /* Stretch to fit content */
+      justify-content: center;
+      border: 1px solid #000;
+      font-size: 28px; /* Increased from 24px */
+      font-weight: bold;
+      background-color: #f9f9f9;
+      word-wrap: break-word; /* Enable word wrapping */
+      white-space: normal; /* Allow wrapping to multiple lines */
+      overflow: hidden; /* Prevent overflow */
+    }
+    .free {
+      background-color: #d4edda;
+    }
+    button {
+      margin: 5px; /* Adjust spacing between buttons */
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    #button-container {
+      display: flex;
+      flex-wrap: wrap; /* Allow wrapping if needed */
+      justify-content: center; /* Center buttons horizontally */
+      margin-top: 20px;
+    }
+    #play-button {
+      display: block; /* Place on a new line */
+      width: 200px; /* Make the button longer */
+      margin: 10px auto; /* Center the button horizontally */
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      background-color: #28a745; /* Green background */
+      color: white; /* White text */
+      border: none; /* Remove border */
+      border-radius: 5px; /* Rounded corners */
+    }
+    #play-button:hover {
+      background-color: #218838; /* Darker green on hover */
+    }
+    .cell textarea {
+      width: 100%;
+      height: 100%;
+      border: none;
+      text-align: center; /* Center text horizontally */
+      font-size: 20px; /* Adjusted font size for better wrapping */
+      font-weight: bold;
+      background-color: transparent;
+      overflow-wrap: break-word; /* Ensure long words break properly */
+      white-space: pre-wrap; /* Preserve spaces and allow wrapping */
+      display: table-cell;
+      align-items: center; /* Center text vertically */
+      justify-content: center; /* Center text horizontally */
+      padding: 0; /* Remove padding for proper centering */
+      box-sizing: border-box; /* Include padding in width/height */
+      resize: none; /* Prevent resizing */
+      line-height: normal; /* Ensure proper line height for vertical centering */
+      vertical-align: middle; /* Vertically align text */
+    }
+    .cell textarea:focus {
+      outline: none;
+      background-color: #e0f7fa;
+    }
+  </style>
+</head>
+<body>
+  <input id="bingo-title" type="text" value="Bingo Card Maker" 
+         style="font-size: 24px; font-weight: bold; text-align: center; border: 1px solid #ccc; border-radius: 5px; background: transparent; margin-bottom: 20px; padding: 5px;" 
+         oninput="updateTitleState()" />
+  <div id="bingo-card"></div>
+  <div id="button-container">
+    <button onclick="openNewCard()">New</button>
+    <button onclick="cloneBingoCard()">Clone</button>
+    <button onclick="resetBingoCard()">Reset</button>
+  </div>
+  <button id="play-button" onclick="goToPlayPage()">Play!</button>
+
+  <script>
+    function generateRandomNumbers(min, max, count) {
+      const numbers = new Set();
+      while (numbers.size < count) {
+        const randomNum = Math.floor(Math.random() * (max - min + 1)) + min;
+        numbers.add(randomNum);
+      }
+      return Array.from(numbers);
+    }
+
+    function generateBingoCard() {
+      const bingoCard = document.getElementById('bingo-card');
+      bingoCard.innerHTML = ''; // Clear the card
+
+      // Create empty cells for manual input
+      for (let i = 0; i < 25; i++) {
+        const cell = document.createElement('div');
+        cell.classList.add('cell');
+        const textarea = document.createElement('textarea');
+        textarea.value = i === 12 ? 'FREE' : ''; // Center "FREE" cell
+        if (i === 12) textarea.readOnly = true;
+        textarea.addEventListener('input', updateURLState);
+        cell.appendChild(textarea);
+        bingoCard.appendChild(cell);
+      }
+
+      updateURLState(); // Save initial state
+    }
+
+    function updateURLState() {
+      const textareas = document.querySelectorAll('#bingo-card textarea');
+      const cellValues = Array.from(textareas).map(textarea => textarea.value);
+      const title = document.getElementById('bingo-title').value;
+      const encodedState = btoa(JSON.stringify({ title, cells: cellValues })); // Base64 encode the state
+      const newURL = `${window.location.origin}${window.location.pathname}?state=${encodedState}`;
+      window.history.replaceState(null, '', newURL);
+    }
+
+    function loadStateFromURL() {
+      const params = new URLSearchParams(window.location.search);
+      const state = params.get('state');
+      const bingoCard = document.getElementById('bingo-card');
+      const titleInput = document.getElementById('bingo-title');
+      bingoCard.innerHTML = ''; // Clear the card
+
+      if (state) {
+        try {
+          const { title, cells } = JSON.parse(atob(state)); // Decode Base64 state
+          titleInput.value = title;
+          cells.forEach((value, index) => {
+            const cell = document.createElement('div');
+            cell.classList.add('cell');
+            const textarea = document.createElement('textarea');
+            textarea.value = value;
+            if (index === 12) textarea.readOnly = true; // Center "FREE" cell
+            textarea.addEventListener('input', updateURLState);
+            cell.appendChild(textarea);
+            bingoCard.appendChild(cell);
+          });
+        } catch (error) {
+          console.error('Failed to decode state from URL:', error);
+          generateBingoCard(); // Generate a new card if decoding fails
+        }
+      } else {
+        generateBingoCard();
+      }
+    }
+
+    function updateTitleState() {
+      updateURLState();
+    }
+
+    function resetBingoCard() {
+      document.getElementById('bingo-title').value = 'Bingo Card Maker'; // Reset title
+      generateBingoCard(); // Clear the card
+    }
+
+    function goToPlayPage() {
+      const params = new URLSearchParams(window.location.search);
+      const state = params.get('state');
+      if (state) {
+        window.location.href = `play.html?state=${state}`;
+      } else {
+        alert('Please generate or edit a Bingo card before playing.');
+      }
+    }
+
+    function openNewCard() {
+      const blankState = btoa(JSON.stringify({ 
+        title: 'Bingo Card Maker', 
+        cells: Array(25).fill('').map((value, index) => index === 12 ? 'FREE' : value) // Ensure "FREE" space remains
+      }));
+      const newURL = `${window.location.origin}${window.location.pathname}?state=${blankState}`;
+      window.open(newURL, '_blank'); // Open a new tab with the blank card
+    }
+
+    function cloneBingoCard() {
+      const params = new URLSearchParams(window.location.search);
+      const state = params.get('state');
+      if (state) {
+        const newURL = `${window.location.origin}${window.location.pathname}?state=${state}`;
+        window.open(newURL, '_blank'); // Open a new tab with the current state
+      } else {
+        alert('No Bingo card state found to clone.');
+      }
+    }
+
+    // Load the state from the URL or generate a new card
+    loadStateFromURL();
+  </script>
+</body>
+</html>

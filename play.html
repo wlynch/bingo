@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bingo Play</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background-color: #f0f0f0;
+    }
+    #bingo-card {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 5px;
+      width: auto;
+      margin-top: 20px;
+      justify-content: center;
+    }
+    .cell {
+      width: 120px;
+      height: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #000;
+      font-size: 20px;
+      font-weight: bold;
+      background-color: #f9f9f9;
+      cursor: pointer;
+      user-select: none;
+    }
+    .cell.completed {
+      background-color: #d4edda;
+      text-decoration: line-through;
+    }
+    .free {
+      background-color: #d4edda;
+      cursor: default;
+    }
+    button {
+      margin: 5px; /* Adjust spacing between buttons */
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    #button-container {
+      display: flex;
+      flex-wrap: wrap; /* Allow wrapping if needed */
+      justify-content: center; /* Center buttons horizontally */
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1 id="bingo-title"></h1>
+  <div id="bingo-card"></div>
+  <div id="button-container">
+    <button onclick="goToEditPage()">Edit</button>
+    <button onclick="resetCompletedCells()">Reset</button>
+  </div>
+  <script>
+    function loadStateFromURL() {
+      const params = new URLSearchParams(window.location.search);
+      const state = params.get('state');
+      const bingoCard = document.getElementById('bingo-card');
+      const titleElement = document.getElementById('bingo-title');
+      bingoCard.innerHTML = ''; // Clear the card
+
+      if (state) {
+        try {
+          const { title, cells } = JSON.parse(atob(state)); // Decode Base64 state
+          titleElement.textContent = title;
+          cells.forEach((value, index) => {
+            const cell = document.createElement('div');
+            cell.classList.add('cell');
+            cell.textContent = value;
+            if (index === 12) {
+              cell.classList.add('free');
+            } else {
+              cell.addEventListener('click', () => {
+                cell.classList.toggle('completed');
+              });
+            }
+            bingoCard.appendChild(cell);
+          });
+        } catch (error) {
+          console.error('Failed to decode state from URL:', error);
+          bingoCard.innerHTML = '<p>Invalid state. Please return to the edit page to create a new Bingo card.</p>';
+        }
+      } else {
+        bingoCard.innerHTML = '<p>No state found. Please return to the edit page to create a Bingo card.</p>';
+      }
+    }
+
+    function goToEditPage() {
+      const params = new URLSearchParams(window.location.search);
+      const state = params.get('state');
+      if (state) {
+        window.location.href = `index.html?state=${state}`;
+      } else {
+        alert('No Bingo card state found to edit.');
+      }
+    }
+
+    function resetCompletedCells() {
+      const cells = document.querySelectorAll('#bingo-card .cell');
+      cells.forEach(cell => cell.classList.remove('completed')); // Remove completed class
+    }
+
+    // Load the state from the URL
+    loadStateFromURL();
+  </script>
+</body>
+</html>
