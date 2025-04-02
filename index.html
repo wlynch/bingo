@@ -19,22 +19,21 @@
       display: grid;
       grid-template-columns: repeat(5, 1fr);
       gap: 5px;
-      width: auto; /* Adjust width to fit the grid */
+      width: 100%; /* Make the grid responsive */
+      max-width: 600px; /* Limit the maximum width */
       margin-top: 20px; /* Add spacing between the title and the grid */
       justify-content: center; /* Center the grid horizontally */
     }
     .cell {
-      width: 120px; /* Increased from 100px */
-      height: 120px; /* Increased from 100px */
+      width: 100%; /* Adjust cell width to fit the grid */
+      aspect-ratio: 1; /* Maintain square shape */
       display: flex;
-      align-items: stretch; /* Stretch to fit content */
+      align-items: center;
       justify-content: center;
       border: 1px solid #000;
-      font-size: 28px; /* Increased from 24px */
+      font-size: 16px; /* Adjust font size for smaller screens */
       font-weight: bold;
       background-color: #f9f9f9;
-      word-wrap: break-word; /* Enable word wrapping */
-      white-space: normal; /* Allow wrapping to multiple lines */
       overflow: hidden; /* Prevent overflow */
     }
     .free {
@@ -72,7 +71,7 @@
       height: 100%;
       border: none;
       text-align: center; /* Center text horizontally */
-      font-size: 20px; /* Adjusted font size for better wrapping */
+      font-size: 14px; /* Adjust font size for smaller screens */
       font-weight: bold;
       background-color: transparent;
       overflow-wrap: break-word; /* Ensure long words break properly */

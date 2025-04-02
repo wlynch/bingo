@@ -19,18 +19,19 @@
       display: grid;
       grid-template-columns: repeat(5, 1fr);
       gap: 5px;
-      width: auto;
+      width: 100%; /* Make the grid responsive */
+      max-width: 600px; /* Limit the maximum width */
       margin-top: 20px;
       justify-content: center;
     }
     .cell {
-      width: 120px;
-      height: 120px;
+      width: 100%; /* Adjust cell width to fit the grid */
+      aspect-ratio: 1; /* Maintain square shape */
       display: flex;
       align-items: center;
       justify-content: center;
       border: 1px solid #000;
-      font-size: 20px;
+      font-size: 16px; /* Adjust font size for smaller screens */
       font-weight: bold;
       background-color: #f9f9f9;
       cursor: pointer;
