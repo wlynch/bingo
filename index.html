@@ -35,6 +35,8 @@
       font-weight: bold;
       background-color: #f9f9f9;
       overflow: hidden; /* Prevent overflow */
+      max-width: 150px; /* Limit the maximum width of the cell */
+      max-height: 150px; /* Limit the maximum height of the cell */
     }
     .free {
       background-color: #d4edda;
@@ -89,6 +91,17 @@
       outline: none;
       background-color: #e0f7fa;
     }
+    @media (max-width: 600px) {
+      #bingo-card {
+        max-width: 100%; /* Allow the grid to use the full width on smaller screens */
+        gap: 3px; /* Reduce the gap between cells */
+      }
+      .cell {
+        max-width: 80px; /* Reduce the maximum width of cells */
+        max-height: 80px; /* Reduce the maximum height of cells */
+        font-size: 16px; /* Adjust font size for better visibility */
+      }
+    }
   </style>
 </head>
 <body>
@@ -100,6 +113,7 @@
     <button onclick="openNewCard()">New</button>
     <button onclick="cloneBingoCard()">Clone</button>
     <button onclick="resetBingoCard()">Reset</button>
+    <button onclick="sharePlayURL()">Share</button>
   </div>
   <button id="play-button" onclick="goToPlayPage()">Play!</button>
 
@@ -233,8 +247,20 @@
       }
     }
 
-    // Load the state from the URL or generate a new card
-    loadStateFromURL();
+    function adjustBingoCardSize() {
+      const bingoCard = document.getElementById('bingo-card');
+      if (bingoCard) {
+        const cardWidth = bingoCard.offsetWidth; // Get the width of the grid container
+        const cellSize = Math.min(cardWidth / 5, 150); // Divide by 5 and limit to 150px
+        bingoCard.style.gridAutoRows = `${cellSize}px`; // Set the row height to match the cell width
+      }
+    }
+
+    window.addEventListener('resize', adjustBingoCardSize);
+    document.addEventListener('DOMContentLoaded', () => {
+      adjustBingoCardSize();
+      loadStateFromURL(); // Ensure this runs after adjusting the size
+    });
   </script>
 </body>
 </html>
